@@ -34,7 +34,35 @@ public class MemoryManager {
     }
 
     private void writeUsingBestFit(Process p) {
+        Integer index = null;
+        int freeSpaces = 0;
+        int actualSize = 0;
+        for (int i = 0; i < physicMemory.length; i++) {
+            if (i == physicMemory.length - 1) {
+                index = i - freeSpaces;
+            }
+            if (physicMemory[i] == null) {
+                actualSize++;
+                if (actualSize > freeSpaces) {
+                    if (comparator(p.getSizeInMemory(), actualSize, freeSpaces)) {
+                        index = i - actualSize + 1;
+                        freeSpaces = actualSize;
+                    } else {
+                        index = i - freeSpaces;
+                        freeSpaces = actualSize;
+                    }
 
+                }
+            } else {
+                actualSize = 0;
+            }
+        }
+        AdressMemory address = createAdressMemory(index, index + (freeSpaces - 1));
+        if (p.getSizeInMemory() <= address.getSize()) {
+            insertProcessInMemory(p, address);
+        }
+
+        printMemoryStatus();
     }
 
     private void writeUsingWorstFit(Process p) {
@@ -108,5 +136,15 @@ public class MemoryManager {
 
     private AdressMemory createAdressMemory(int start, int end) {
         return new AdressMemory(start, end);
+    }
+
+    private boolean comparator(int comp, int num1, int num2) {
+        int result1 = comp - num1;
+        int retult2 = comp - num2;
+        if (result1 < retult2) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -17,7 +17,7 @@ public class Process {
     public Process() {
         Random r = new Random();
         this.id = UUID.randomUUID().toString();
-        List<Integer> givenList = Arrays.asList(1, 2, 4, 5, 8, 10, 20, 50);
+        List<Integer> givenList = Arrays.asList(1, 2, 4, 5, 8, 10, 20, 50, 100);
         this.sizeInMemory = givenList.get(r.nextInt(givenList.size()));
     }
 
