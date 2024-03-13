@@ -34,26 +34,24 @@ public class SystemOperation {
         SystemOperation.schedule = schedule;
     }
 
-    public static Process SystemCall(SystemCallType type, Process p) {
+    public static Process SystemCall(SystemCallType type, Process p, Integer size) {
         if (type.equals(SystemCallType.WRITE_PROCESS)) {
             mm.write(p);
-
         }
         if (type.equals(SystemCallType.READ_PROCESS)) {
             System.out.println("Ler");
         }
         if (type.equals(SystemCallType.DELETE_PROCESS)) {
-            System.out.println("Deletar");
+            mm.delete(p);
         }
         if (type.equals(SystemCallType.CREATE_PROCESS)) {
             if (cm == null) {
                 cm = new CpuManager();
             }
             if (mm == null) {
-                mm = new MemoryManager(Strategy.BEST_FIT);
-
+                mm = new MemoryManager(Strategy.FIRST_FIT);
             }
-            return new Process();
+            return new Process(size - 1);
         }
 
         return null;

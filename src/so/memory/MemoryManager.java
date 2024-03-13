@@ -38,31 +38,32 @@ public class MemoryManager {
         int freeSpaces = 0;
         int actualSize = 0;
         for (int i = 0; i < physicMemory.length; i++) {
-            if (i == physicMemory.length - 1) {
-                index = i - freeSpaces;
+            if (i == (physicMemory.length - 1)) {
+                if (index == null) {
+                    index = i - actualSize;
+                }
+
             }
             if (physicMemory[i] == null) {
                 actualSize++;
-                if (actualSize > freeSpaces) {
-                    if (comparator(p.getSizeInMemory(), actualSize, freeSpaces)) {
-                        index = i - actualSize + 1;
-                        freeSpaces = actualSize;
-                    } else {
-                        index = i - freeSpaces;
-                        freeSpaces = actualSize;
-                    }
-
-                }
             } else {
+                if (actualSize > freeSpaces) {
+                    index = i - comparator(p.getSizeInMemory(), actualSize, freeSpaces);
+                    freeSpaces = actualSize;
+                }
                 actualSize = 0;
             }
+
         }
-        AdressMemory address = createAdressMemory(index, index + (freeSpaces - 1));
+        int start = (index);
+        int end = start + p.getSizeInMemory();
+        AddressMemory address = createAddressMemory(start, end);
         if (p.getSizeInMemory() <= address.getSize()) {
             insertProcessInMemory(p, address);
         }
 
         printMemoryStatus();
+
     }
 
     private void writeUsingWorstFit(Process p) {
@@ -83,7 +84,9 @@ public class MemoryManager {
         }
 
         if (index != null) {
-            AdressMemory address = createAdressMemory(index, index + (freeSpaces - 1));
+            int start = (index);
+            int end = start + p.getSizeInMemory();
+            AddressMemory address = createAddressMemory(start, end);
             if (p.getSizeInMemory() <= address.getSize()) {
                 insertProcessInMemory(p, address);
             }
@@ -96,24 +99,27 @@ public class MemoryManager {
         for (int i = 0; i < physicMemory.length; i++) {
             if (i == (physicMemory.length - 1)) {
                 if (actualSize > 0) {
-                    AdressMemory adress = createAdressMemory((i - actualSize), i);
-                    if (p.getSizeInMemory() <= adress.getSize()) {
-                        insertProcessInMemory(p, adress);
+                    int start = (i - actualSize);
+                    int end = start + p.getSizeInMemory();
+                    AddressMemory address = createAddressMemory(start, end);
+                    if (p.getSizeInMemory() <= address.getSize()) {
+                        insertProcessInMemory(p, address);
                         break;
                     }
                 }
-            }
-            if (physicMemory[i] == null) {
+            } else if (physicMemory[i] == null) {
                 actualSize++;
             } else {
                 if (actualSize > 0) {
-                    AdressMemory adress = createAdressMemory((i - actualSize), i);
-                    if (p.getSizeInMemory() <= adress.getSize()) {
-                        insertProcessInMemory(p, adress);
+                    int start = (i - actualSize);
+                    int end = start + p.getSizeInMemory();
+                    AddressMemory address = createAddressMemory(start, end);
+                    if (p.getSizeInMemory() <= address.getSize()) {
+                        insertProcessInMemory(p, address);
                         break;
                     }
+                    actualSize = 0;
                 }
-                actualSize = 0;
 
             }
 
@@ -122,29 +128,44 @@ public class MemoryManager {
 
     }
 
+    public void delete(Process p) {
+        for (int i = 0; i < physicMemory.length; i++) {
+            if (p.getId().equals(physicMemory[i])) {
+                physicMemory[i] = null;
+            }
+        }
+
+        System.out.println("DELETADO");
+    }
+
     private void printMemoryStatus() {
+
         for (int i = 0; i < physicMemory.length; i++) {
             System.out.print(physicMemory[i] + " : ");
         }
+        System.out.println("");
+        System.out.println(
+                "-----------------------------------------------------------------------------------------------------------------------------------");
     }
 
-    private void insertProcessInMemory(Process p, AdressMemory adress) {
-        for (int i = adress.getStart(); i <= adress.getEnd(); i++) {
+    private void insertProcessInMemory(Process p, AddressMemory address) {
+        System.out.println("COMEÇO: " + address.getStart() + " FIM: " + address.getEnd());
+        for (int i = address.getStart(); i <= address.getEnd(); i++) {
             this.physicMemory[i] = p.getId();
         }
     }
 
-    private AdressMemory createAdressMemory(int start, int end) {
-        return new AdressMemory(start, end);
+    private AddressMemory createAddressMemory(int start, int end) {
+        return new AddressMemory(start, end);
     }
 
-    private boolean comparator(int comp, int num1, int num2) {
+    private int comparator(int comp, int num1, int num2) {
         int result1 = comp - num1;
-        int retult2 = comp - num2;
-        if (result1 < retult2) {
-            return true;
+        int result2 = comp - num2;
+        if (result1 <= result2) {
+            return num1;
         } else {
-            return false;
+            return num2;
         }
     }
 }

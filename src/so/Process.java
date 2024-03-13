@@ -1,28 +1,23 @@
 package so;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
-import so.memory.AdressMemory;
+import so.memory.AddressMemory;
 
 public class Process {
     private String id;
     private int sizeInMemory;
     // private List<Process> processes;
     // private int timeToExecution;
-    private AdressMemory adressInMemory;
+    private AddressMemory addressInMemory;
 
-    public Process() {
-        Random r = new Random();
+    public Process(int sizeInMemory) {
         this.id = UUID.randomUUID().toString();
-        List<Integer> givenList = Arrays.asList(1, 2, 4, 5, 8, 10, 20, 50, 100);
-        this.sizeInMemory = givenList.get(r.nextInt(givenList.size()));
+        this.sizeInMemory = sizeInMemory;
     }
 
-    public AdressMemory getAdressInMemory() {
-        return adressInMemory;
+    public AddressMemory getAddressInMemory() {
+        return addressInMemory;
     }
 
     public String getId() {
@@ -33,8 +28,8 @@ public class Process {
         return sizeInMemory;
     }
 
-    public void setAdressInMemory(AdressMemory adressInMemory) {
-        this.adressInMemory = adressInMemory;
+    public void setAddressInMemory(AddressMemory addressInMemory) {
+        this.addressInMemory = addressInMemory;
     }
 
     public void setId(String id) {

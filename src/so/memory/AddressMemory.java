@@ -1,10 +1,10 @@
 package so.memory;
 
-public class AdressMemory {
+public class AddressMemory {
     private int start;
     private int end;
 
-    public AdressMemory(int start, int end) {
+    public AddressMemory(int start, int end) {
         this.start = start;
         this.end = end;
 
