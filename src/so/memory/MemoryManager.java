@@ -62,8 +62,6 @@ public class MemoryManager {
             insertProcessInMemory(p, address);
         }
 
-        printMemoryStatus();
-
     }
 
     private void writeUsingWorstFit(Process p) {
@@ -91,7 +89,6 @@ public class MemoryManager {
                 insertProcessInMemory(p, address);
             }
         }
-        printMemoryStatus();
     }
 
     private void writeUsingFirstFit(Process p) {
@@ -124,7 +121,6 @@ public class MemoryManager {
             }
 
         }
-        printMemoryStatus();
 
     }
 
@@ -134,25 +130,24 @@ public class MemoryManager {
                 physicMemory[i] = null;
             }
         }
-
-        System.out.println("DELETADO");
+        System.out.println("==========================================================================");
+        System.out
+                .println("Processo: " + p.getId() + " deletado");
     }
 
-    private void printMemoryStatus() {
-
-        for (int i = 0; i < physicMemory.length; i++) {
-            System.out.print(physicMemory[i] + " : ");
-        }
-        System.out.println("");
-        System.out.println(
-                "-----------------------------------------------------------------------------------------------------------------------------------");
+    private void printMemoryStatus(Process p, AddressMemory address) {
+        System.out.println("===========================================================================");
+        System.out
+                .println("Processo: " + p.getId() + " inserido do índice: : " + address.getStart() + " ao "
+                        + address.getEnd());
     }
 
     private void insertProcessInMemory(Process p, AddressMemory address) {
-        System.out.println("COMEÇO: " + address.getStart() + " FIM: " + address.getEnd());
         for (int i = address.getStart(); i <= address.getEnd(); i++) {
             this.physicMemory[i] = p.getId();
         }
+
+        printMemoryStatus(p, address);
     }
 
     private AddressMemory createAddressMemory(int start, int end) {
