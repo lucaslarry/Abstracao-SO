@@ -35,31 +35,41 @@ public class MemoryManager {
 
     private void writeUsingBestFit(Process p) {
         Integer index = null;
-        int freeSpaces = 0;
         int actualSize = 0;
+        int freeSpaces = physicMemory.length;
         for (int i = 0; i < physicMemory.length; i++) {
-            if (i == (physicMemory.length - 1)) {
-                if (index == null) {
-                    index = i - actualSize;
+            if (i == physicMemory.length - 1) {
+                if (actualSize > 0 || actualSize == p.getSizeInMemory()) {
+                    if (actualSize < freeSpaces) {
+                        index = i - actualSize;
+                    }
                 }
 
             }
             if (physicMemory[i] == null) {
                 actualSize++;
             } else {
-                if (actualSize > freeSpaces) {
-                    index = i - comparator(p.getSizeInMemory(), actualSize, freeSpaces);
-                    freeSpaces = actualSize;
+                if (actualSize > 0) {
+                    if (actualSize < freeSpaces && actualSize >= p.getSizeInMemory()) {
+                        index = i - actualSize;
+                        freeSpaces = actualSize;
+                    }
                 }
                 actualSize = 0;
             }
 
         }
-        int start = (index);
-        int end = start + p.getSizeInMemory();
-        AddressMemory address = createAddressMemory(start, end);
-        if (p.getSizeInMemory() <= address.getSize()) {
-            insertProcessInMemory(p, address);
+
+        if (index != null) {
+            int start = (index);
+            int end = start + p.getSizeInMemory();
+            AddressMemory address = createAddressMemory(start, end);
+            if (p.getSizeInMemory() <= address.getSize() && end <= physicMemory.length - 1) {
+                insertProcessInMemory(p, address);
+            } else {
+                System.out.println("===========================================================================");
+                System.out.println("Insufficient memory!! Unable to add process: " + p.getId());
+            }
         }
 
     }
@@ -85,8 +95,11 @@ public class MemoryManager {
             int start = (index);
             int end = start + p.getSizeInMemory();
             AddressMemory address = createAddressMemory(start, end);
-            if (p.getSizeInMemory() <= address.getSize()) {
+            if (p.getSizeInMemory() <= address.getSize() && end <= physicMemory.length - 1) {
                 insertProcessInMemory(p, address);
+            } else {
+                System.out.println("===========================================================================");
+                System.out.println("Insufficient memory!! Unable to add process: " + p.getId());
             }
         }
     }
@@ -94,32 +107,37 @@ public class MemoryManager {
     private void writeUsingFirstFit(Process p) {
         int actualSize = 0;
         for (int i = 0; i < physicMemory.length; i++) {
-            if (i == (physicMemory.length - 1)) {
-                if (actualSize > 0) {
-                    int start = (i - actualSize);
-                    int end = start + p.getSizeInMemory();
-                    AddressMemory address = createAddressMemory(start, end);
-                    if (p.getSizeInMemory() <= address.getSize()) {
-                        insertProcessInMemory(p, address);
-                        break;
-                    }
+            if (actualSize == (p.getSizeInMemory() + 1)) {
+                int start = i - actualSize;
+                int end = start + p.getSizeInMemory();
+                AddressMemory address = createAddressMemory(start, end);
+                if (p.getSizeInMemory() <= address.getSize()) {
+                    insertProcessInMemory(p, address);
+                    actualSize = -1;
+                    break;
                 }
-            } else if (physicMemory[i] == null) {
+            }
+            if (physicMemory[i] == null) {
                 actualSize++;
             } else {
                 if (actualSize > 0) {
-                    int start = (i - actualSize);
+                    int start = i - actualSize;
                     int end = start + p.getSizeInMemory();
                     AddressMemory address = createAddressMemory(start, end);
-                    if (p.getSizeInMemory() <= address.getSize()) {
+                    if (p.getSizeInMemory() >= address.getSize()) {
                         insertProcessInMemory(p, address);
+                        actualSize = -1;
                         break;
                     }
-                    actualSize = 0;
-                }
 
+                }
+                actualSize = 0;
             }
 
+        }
+        if (actualSize != -1) {
+            System.out.println("===========================================================================");
+            System.out.println("Insufficient memory!! Unable to add process:" + p.getId());
         }
 
     }
@@ -132,13 +150,13 @@ public class MemoryManager {
         }
         System.out.println("==========================================================================");
         System.out
-                .println("Processo: " + p.getId() + " deletado");
+                .println("Process: " + p.getId() + " deleted");
     }
 
     private void printMemoryStatus(Process p, AddressMemory address) {
         System.out.println("===========================================================================");
         System.out
-                .println("Processo: " + p.getId() + " inserido do índice: : " + address.getStart() + " ao "
+                .println("Process: " + p.getId() + " inserted from index: : " + address.getStart() + " to "
                         + address.getEnd());
     }
 
@@ -154,13 +172,4 @@ public class MemoryManager {
         return new AddressMemory(start, end);
     }
 
-    private int comparator(int comp, int num1, int num2) {
-        int result1 = comp - num1;
-        int result2 = comp - num2;
-        if (result1 <= result2) {
-            return num1;
-        } else {
-            return num2;
-        }
-    }
 }
