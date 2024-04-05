@@ -1,15 +1,29 @@
 package so.memory;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
 import so.Process;
 
 public class MemoryManager {
     private Strategy strategy;
-    private String[] physicMemory;
+    private String[] physicalMemory;
+    private Hashtable<String, List<FrameMemory>> logicalMemory;
+    private int pageSize;
 
     public MemoryManager(Strategy strategy) {
+        this.pageSize = 2;
         this.strategy = strategy;
-        this.physicMemory = new String[128];
+        this.physicalMemory = new String[128];
+        this.logicalMemory = new Hashtable<>();
 
+    }
+    public MemoryManager(Strategy strategy, int pageSize) {
+        this.pageSize = pageSize;
+        this.strategy = strategy;
+        this.physicalMemory = new String[128];
+        this.logicalMemory = new Hashtable<>();
     }
 
     public void write(Process p) {
@@ -26,19 +40,43 @@ public class MemoryManager {
             this.writeUsingPaging(p);
         }
 
+
+    }
+
+    private List<FrameMemory> getFrames(Process p){
+        int processSize = 0;
+        List<FrameMemory> frames = new ArrayList<>();
+        for(int page = 0; page < this.physicalMemory.length; page+= this.pageSize){
+            if(physicalMemory[page] == null){
+                processSize+=this.pageSize;
+                frames.add(new FrameMemory(page, this.pageSize));
+
+                int spaceInPages = (frames.size() * this.pageSize);
+                if(processSize <= spaceInPages){
+                    return frames;
+                }
+            }
+        }
+        return null;
     }
 
     private void writeUsingPaging(Process p) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'writeUsingPaging'");
+        List<FrameMemory> frames = this.getFrames(p);
+        for(int i = 0; i<frames.size(); i++){
+            FrameMemory actuallyFrame = frames.get(i);
+            for(int j = actuallyFrame.getPageNum(); j < actuallyFrame.getDisplacement(); j++){
+                this.physicalMemory[j] = p.getId();
+            }
+        }
+        this.logicalMemory.put(p.getId(), frames);
     }
 
     private void writeUsingBestFit(Process p) {
         Integer index = null;
         int actualSize = 0;
-        int freeSpaces = physicMemory.length;
-        for (int i = 0; i < physicMemory.length; i++) {
-            if (i == physicMemory.length - 1) {
+        int freeSpaces = physicalMemory.length;
+        for (int i = 0; i < physicalMemory.length; i++) {
+            if (i == physicalMemory.length - 1) {
                 if (actualSize > 0 || actualSize == p.getSizeInMemory()) {
                     if (actualSize < freeSpaces) {
                         index = i - actualSize;
@@ -46,7 +84,7 @@ public class MemoryManager {
                 }
 
             }
-            if (physicMemory[i] == null) {
+            if (physicalMemory[i] == null) {
                 actualSize++;
             } else {
                 if (actualSize > 0) {
@@ -64,7 +102,7 @@ public class MemoryManager {
             int start = (index);
             int end = start + p.getSizeInMemory();
             AddressMemory address = createAddressMemory(start, end);
-            if (p.getSizeInMemory() <= address.getSize() && end <= physicMemory.length - 1) {
+            if (p.getSizeInMemory() <= address.getSize() && end <= physicalMemory.length - 1) {
                 insertProcessInMemory(p, address);
             } else {
                 System.out.println("===========================================================================");
@@ -78,8 +116,8 @@ public class MemoryManager {
         Integer index = null;
         int actualSize = 0;
         int freeSpaces = 0;
-        for (int i = 0; i < physicMemory.length; i++) {
-            if (physicMemory[i] == null) {
+        for (int i = 0; i < physicalMemory.length; i++) {
+            if (physicalMemory[i] == null) {
                 actualSize++;
                 if (actualSize > freeSpaces) {
                     index = i - freeSpaces;
@@ -95,7 +133,7 @@ public class MemoryManager {
             int start = (index);
             int end = start + p.getSizeInMemory();
             AddressMemory address = createAddressMemory(start, end);
-            if (p.getSizeInMemory() <= address.getSize() && end <= physicMemory.length - 1) {
+            if (p.getSizeInMemory() <= address.getSize() && end <= physicalMemory.length - 1) {
                 insertProcessInMemory(p, address);
             } else {
                 System.out.println("===========================================================================");
@@ -106,7 +144,7 @@ public class MemoryManager {
 
     private void writeUsingFirstFit(Process p) {
         int actualSize = 0;
-        for (int i = 0; i < physicMemory.length; i++) {
+        for (int i = 0; i < physicalMemory.length; i++) {
             if (actualSize == (p.getSizeInMemory() + 1)) {
                 int start = i - actualSize;
                 int end = start + p.getSizeInMemory();
@@ -117,35 +155,44 @@ public class MemoryManager {
                     break;
                 }
             }
-            if (physicMemory[i] == null) {
+            if (physicalMemory[i] == null) {
                 actualSize++;
             } else {
-                if (actualSize > 0) {
+                if(actualSize > 0 ){
+                if (actualSize == (p.getSizeInMemory() + 1)) {
                     int start = i - actualSize;
                     int end = start + p.getSizeInMemory();
                     AddressMemory address = createAddressMemory(start, end);
-                    if (p.getSizeInMemory() >= address.getSize()) {
+                    if (p.getSizeInMemory() <= address.getSize()) {
                         insertProcessInMemory(p, address);
                         actualSize = -1;
                         break;
                     }
-
                 }
                 actualSize = 0;
-            }
+            }}
 
         }
         if (actualSize != -1) {
             System.out.println("===========================================================================");
-            System.out.println("Insufficient memory!! Unable to add process:" + p.getId());
+            System.out.println("Insufficient memory!! Unable to add process: " + p.getId());
         }
 
     }
 
     public void delete(Process p) {
-        for (int i = 0; i < physicMemory.length; i++) {
-            if (p.getId().equals(physicMemory[i])) {
-                physicMemory[i] = null;
+        List<FrameMemory> frames = this.logicalMemory.get(p.getId());
+        if(frames == null){
+        for (int i = 0; i < physicalMemory.length; i++) {
+            if (p.getId().equals(physicalMemory[i])) {
+                physicalMemory[i] = null;
+            }
+        }}else{
+            for(int i = 0; i < frames.size(); i++){
+                FrameMemory actuallyFrame = frames.get(i);
+                for(int j = actuallyFrame.getPageNum(); j < actuallyFrame.getDisplacement(); j++){
+                    this.physicalMemory[j] = null;
+                }
             }
         }
         System.out.println("==========================================================================");
@@ -162,7 +209,7 @@ public class MemoryManager {
 
     private void insertProcessInMemory(Process p, AddressMemory address) {
         for (int i = address.getStart(); i <= address.getEnd(); i++) {
-            this.physicMemory[i] = p.getId();
+            this.physicalMemory[i] = p.getId();
         }
 
         printMemoryStatus(p, address);
