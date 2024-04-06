@@ -49,7 +49,7 @@ public class SystemOperation {
                 cm = new CpuManager();
             }
             if (mm == null) {
-                mm = new MemoryManager(Strategy.PAGING);
+                mm = new MemoryManager(Strategy.FIRST_FIT);
             }
             return new Process(size - 1);
         }

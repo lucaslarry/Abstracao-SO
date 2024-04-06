@@ -85,29 +85,5 @@ public class Execute {
          * SystemOperation.SystemCall(SystemCallType.WRITE_PROCESS, p13, null);
          */
 
-        /*
-        BEST FIT TEST
-
-         * Process p6 = SystemOperation.SystemCall(SystemCallType.CREATE_PROCESS, null,
-         * 1);
-         * SystemOperation.SystemCall(SystemCallType.WRITE_PROCESS, p6, null);
-         * 
-         * Process p7 = SystemOperation.SystemCall(SystemCallType.CREATE_PROCESS, null,
-         * 18);
-         * SystemOperation.SystemCall(SystemCallType.WRITE_PROCESS, p7, null);
-         * 
-         * Process p8 = SystemOperation.SystemCall(SystemCallType.CREATE_PROCESS, null,
-         * 22);
-         * SystemOperation.SystemCall(SystemCallType.WRITE_PROCESS, p8, null);
-         * 
-         * Process p9 = SystemOperation.SystemCall(SystemCallType.CREATE_PROCESS, null,
-         * 6);
-         * SystemOperation.SystemCall(SystemCallType.WRITE_PROCESS, p9, null);
-         * 
-         * Process p10 = SystemOperation.SystemCall(SystemCallType.CREATE_PROCESS, null,
-         * 4);
-         * SystemOperation.SystemCall(SystemCallType.WRITE_PROCESS, p10, null);
-         */
-
     }
 }

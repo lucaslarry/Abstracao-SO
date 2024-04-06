@@ -4,7 +4,7 @@ Esse é um projeto que tem como objetivo simular a forma que a memória é geren
 
 Construida durando o Módulo 6 da universidade Facisa na competencia DESENVOLVER SIMULADOR DE ABSTRAÇÕES DE RECURSOS DE S.O 
 
-### Algoritmos:
+### Algoritmos Fase 1:
     First-Fit: inicia a procura a partir da primeira página de memória (parte baixa) e vai varrendo a memória até encontrar a primeira lacuna suficientemente grande para armazenar o processo.
 
     Best-Fit: varre toda a memória e escolhe a página mais ajustada ao tamanho do processo.
