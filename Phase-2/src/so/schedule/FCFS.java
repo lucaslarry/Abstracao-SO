@@ -10,7 +10,7 @@ public class FCFS extends SchedulerQueue {
         super(new Comparator<Process>() {
             @Override
             public int compare(Process sp1, Process sp2) {
-                return -1;
+                return 1;
             }
         });
 

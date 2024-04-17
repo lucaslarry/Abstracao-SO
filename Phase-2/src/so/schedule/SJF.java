@@ -10,7 +10,7 @@ public class SJF extends SchedulerQueue {
         super(new Comparator<Process>() {
             @Override
             public int compare(Process sp1, Process sp2) {
-                return sp1.getTimeToExecute() < sp2.getTimeToExecute() ? 1 : -1;
+                return sp1.getTimeToExecute() < sp2.getTimeToExecute() ? -1 : 1;
             }
         });
 

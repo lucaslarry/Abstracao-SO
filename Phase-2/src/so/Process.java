@@ -21,11 +21,34 @@ public class Process {
         Random rand = new Random();
         List<Integer> givenList = Arrays.asList(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000);
         this.timeToExecute = givenList.get(rand.nextInt(givenList.size()));
-
         List<ProcessPriority> priorityList = Arrays.asList(ProcessPriority.LOW, ProcessPriority.MEDIUM,
                 ProcessPriority.HIGH,
                 ProcessPriority.MAX);
         this.priority = priorityList.get(rand.nextInt(priorityList.size()));
+    }
+
+    public Process(int sizeInMemory, int timeToExecute) {
+        count++;
+        this.id = "P" + count;
+        this.sizeInMemory = sizeInMemory;
+        this.subProcesses = this.getSubProcesses();
+        this.timeToExecute = timeToExecute;
+        Random rand = new Random();
+        List<ProcessPriority> priorityList = Arrays.asList(ProcessPriority.LOW, ProcessPriority.MEDIUM,
+                ProcessPriority.HIGH,
+                ProcessPriority.MAX);
+        this.priority = priorityList.get(rand.nextInt(priorityList.size()));
+    }
+
+    public Process(int sizeInMemory, ProcessPriority priority) {
+        count++;
+        this.id = "P" + count;
+        this.sizeInMemory = sizeInMemory;
+        this.subProcesses = this.getSubProcesses();
+        Random rand = new Random();
+        List<Integer> givenList = Arrays.asList(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000);
+        this.timeToExecute = givenList.get(rand.nextInt(givenList.size()));
+        this.priority = priority;
     }
 
     public List<String> getSubProcesses() {

@@ -5,6 +5,8 @@ import java.util.List;
 import so.cpu.CpuManager;
 import so.memory.MemoryManager;
 import so.schedule.FCFS;
+import so.schedule.Priority;
+import so.schedule.SJF;
 import so.schedule.Scheduler;
 
 public class SystemOperation {
@@ -47,6 +49,32 @@ public class SystemOperation {
                 mm = new MemoryManager(MEMORY_SIZE, PAGE_SIZE);
             }
             return new Process(processSize);
+        }
+        return null;
+    }
+
+    public static Process systemCall(SystemCallType type, int processSize, int timeToExecute) {
+        if (type.equals(SystemCallType.CREATE_PROCESS)) {
+            if (scheduler == null) {
+                scheduler = new SJF();
+            }
+            if (mm == null) {
+                mm = new MemoryManager(MEMORY_SIZE, PAGE_SIZE);
+            }
+            return new Process(processSize, timeToExecute);
+        }
+        return null;
+    }
+
+    public static Process systemCall(SystemCallType type, int processSize, ProcessPriority priority) {
+        if (type.equals(SystemCallType.CREATE_PROCESS)) {
+            if (scheduler == null) {
+                scheduler = new Priority();
+            }
+            if (mm == null) {
+                mm = new MemoryManager(MEMORY_SIZE, PAGE_SIZE);
+            }
+            return new Process(processSize, priority);
         }
         return null;
     }

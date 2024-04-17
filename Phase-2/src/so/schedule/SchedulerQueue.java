@@ -13,40 +13,57 @@ import so.cpu.Core;
 
 public class SchedulerQueue extends Scheduler {
     private PriorityQueue<Process> queue;
-    private Hashtable<String, List<SubProcess>> SubProcess;
+    private Hashtable<String, List<SubProcess>> subProcesses;
 
     public SchedulerQueue(Comparator<Process> comparator) {
         this.queue = new PriorityQueue<>(comparator);
+        this.subProcesses = new Hashtable<>();
     }
 
     @Override
     public void execute(Process p) {
         List<SubProcess> sps = SystemOperation.systemCall(SystemCallType.READ_PROCESS, p);
         this.queue.add(p);
-        this.SubProcess.put(p.getId(), sps);
+        this.subProcesses.put(p.getId(), sps);
         registerProcess();
 
     }
 
     private void registerProcess() {
-        Process p = this.queue.poll();
-        if (p != null) {
-            List<SubProcess> sps = this.SubProcess.get(p.getId());
-            Core[] cores = this.getCpu().getCores();
-            for (Core core : cores) {
-                if (core.getActuallyProcess() == null) {
-                    SubProcess sp = sps.removeLast();
-                    this.getCpu().registerProcess(core.getId(), sp);
-                }
+        Core[] cores = this.getCpu().getCores();
+        for (Core core : cores) {
+            if (core.getActuallyProcess() == null) {
+                this.coresExecuted(core.getId());
             }
+        }
+    }
 
+    @Override
+    public void coresExecuted(int coreId) {
+        try {
+            Process p = this.queue.peek();
+            if (p != null) {
+                List<SubProcess> sps = this.subProcesses.get(p.getId());
+                if (this.subProcesses.get(p.getId()) == null || this.subProcesses.get(p.getId()).isEmpty()) {
+                    this.queue.poll(); // Remove The first element
+                    this.subProcesses.remove(p.getId());
+                    p = this.queue.peek();
+                    sps = this.subProcesses.get(p.getId());
+
+                }
+                SubProcess actuallySubprocess = sps.remove(0);
+                this.getCpu().registerProcess(coreId, actuallySubprocess);
+
+            }
+        } catch (Exception e) {
+            System.out.print("");
         }
     }
 
     @Override
     public void finish(Process p) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'finish'");
+
     }
 
     public PriorityQueue<Process> getQueue() {
