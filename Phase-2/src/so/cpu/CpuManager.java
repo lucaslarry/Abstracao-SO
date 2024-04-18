@@ -53,13 +53,12 @@ public class CpuManager {
     }
 
     private void printProcessor() {
-        SubProcess before = null;
+        String before = null;
         try {
             for (Core core : cores) {
-                if (!core.getActuallyProcess().equals(before)) {
+                if (!core.getActuallyProcess().getProcessId().equals(before)) {
                     System.out.println("");
-                    System.out.print("");
-                    before = core.getActuallyProcess();
+                    before = core.getActuallyProcess().getProcessId();
                 }
                 System.out.print("executed: " + core.getActuallyProcess().getId() + " | ");
 
@@ -67,6 +66,7 @@ public class CpuManager {
         } catch (java.lang.NullPointerException e) {
             System.out.println("");
         }
-
+        System.out.println("");
     }
+
 }

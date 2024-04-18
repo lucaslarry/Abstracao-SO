@@ -35,7 +35,6 @@ public class MemoryManager {
             for (int frame = 0; frame < frames.size(); frame++) {
                 for (int offset = 0; offset < this.pageSize; offset++) {
                     FrameMemory actuallyFrame = frames.get(frame);
-
                     SubProcess sp = new SubProcess(p.getId(), NUM_OF_INSTRUCTIONS_PER_PROCESS);
                     this.physicalMemory[actuallyFrame.getPageNum()][offset] = sp;
                     actuallyFrame.setOffSet(offset);

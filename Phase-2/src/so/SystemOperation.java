@@ -1,10 +1,12 @@
 package so;
 
 import java.util.List;
+import java.util.Random;
 
 import so.cpu.CpuManager;
 import so.memory.MemoryManager;
 import so.schedule.FCFS;
+import so.schedule.Lottery;
 import so.schedule.Priority;
 import so.schedule.SJF;
 import so.schedule.Scheduler;
@@ -49,6 +51,19 @@ public class SystemOperation {
                 mm = new MemoryManager(MEMORY_SIZE, PAGE_SIZE);
             }
             return new Process(processSize);
+        }
+        return null;
+    }
+
+    public static Process systemCall(SystemCallType type, int processSize, Random rd, int quantityTickets) {
+        if (type.equals(SystemCallType.CREATE_PROCESS)) {
+            if (scheduler == null) {
+                scheduler = new Lottery();
+            }
+            if (mm == null) {
+                mm = new MemoryManager(MEMORY_SIZE, PAGE_SIZE);
+            }
+            return new Process(processSize, rd, quantityTickets);
         }
         return null;
     }
