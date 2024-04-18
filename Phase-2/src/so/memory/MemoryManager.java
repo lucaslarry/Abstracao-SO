@@ -35,10 +35,14 @@ public class MemoryManager {
             for (int frame = 0; frame < frames.size(); frame++) {
                 for (int offset = 0; offset < this.pageSize; offset++) {
                     FrameMemory actuallyFrame = frames.get(frame);
-                    SubProcess sp = new SubProcess(p.getId(), NUM_OF_INSTRUCTIONS_PER_PROCESS);
-                    this.physicalMemory[actuallyFrame.getPageNum()][offset] = sp;
-                    actuallyFrame.setOffSet(offset);
-                    this.logicalMemory.put(sp.getId(), new FrameMemory(actuallyFrame.getPageNum(), offset));
+                    if (SubProcess.count < p.getSizeInMemory()) {
+                        SubProcess sp = new SubProcess(p.getId(), NUM_OF_INSTRUCTIONS_PER_PROCESS);
+                        this.physicalMemory[actuallyFrame.getPageNum()][offset] = sp;
+                        actuallyFrame.setOffSet(offset);
+                        this.logicalMemory.put(sp.getId(), new FrameMemory(actuallyFrame.getPageNum(), offset));
+                    } else {
+                        break;
+                    }
 
                 }
             }
@@ -96,7 +100,8 @@ public class MemoryManager {
 
                 sps.add(this.physicalMemory[fm.getPageNum()][fm.getOffSet()]);
             } catch (Exception e) {
-                System.out.println(e);
+                System.out.println("Page Fault");
+                break;
             }
         }
         return sps;
